@@ -39,6 +39,7 @@ import com.microsoft.identity.client.exception.MsalException;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 public class NewOutlookActivity extends AppCompatActivity {
 
@@ -56,7 +57,7 @@ public class NewOutlookActivity extends AppCompatActivity {
     Button callGraphApiSilentButton;
     TextView logTextView;
     TextView currentUserTextView;
-
+    private ArrayList<Contact> contactArrayList = new ArrayList<>();
 
     public static void start(Context context) {
         Intent intent = new Intent(context, NewOutlookActivity.class);
@@ -141,13 +142,11 @@ public class NewOutlookActivity extends AppCompatActivity {
         currentUserTextView = findViewById(R.id.current_user);
 
         //Sign in user
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (mSingleAccountApp == null) {
-                    return;
-                }
-                mSingleAccountApp.signIn(NewOutlookActivity.this, null, SCOPES, getAuthInteractiveCallback());
+        signInButton.setOnClickListener(v -> {
+            if (mSingleAccountApp == null) {
+                return;
             }
+            mSingleAccountApp.signIn(NewOutlookActivity.this, null, SCOPES, getAuthInteractiveCallback());
         });
 
         //Sign out user
@@ -285,7 +284,10 @@ public class NewOutlookActivity extends AppCompatActivity {
                     @Override
                     public void success(IContactCollectionPage iContactCollectionPage) {
                         Log.d(TAG, "Found Drive " + iContactCollectionPage);
-                        displayGraphResult(iContactCollectionPage.getRawObject());
+                        ArrayList<Contact>  contactArrayList = new ArrayList<>();
+                        contactArrayList.addAll(iContactCollectionPage.getCurrentPage());
+                        // displayGraphResult(iContactCollectionPage.getRawObject());
+                        displayContactListData(contactArrayList);
                     }
 
                     @Override
@@ -298,6 +300,16 @@ public class NewOutlookActivity extends AppCompatActivity {
 
     private void displayGraphResult(@NonNull final JsonObject graphResponse) {
         logTextView.setText(graphResponse.toString());
+    }
+
+    private void displayContactListData(ArrayList<Contact> contacts) {
+        StringBuilder sb = new StringBuilder();
+        for (Contact contact : contacts) {
+            sb.append(contact.displayName);
+            sb.append("\n");
+        }
+
+        logTextView.setText(sb.toString());
     }
 
     private void updateUI(@Nullable final IAccount account) {
