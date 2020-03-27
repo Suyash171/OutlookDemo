@@ -25,6 +25,7 @@ import com.microsoft.graph.core.ClientException;
 import com.microsoft.graph.http.IHttpRequest;
 import com.microsoft.graph.models.extensions.Contact;
 import com.microsoft.graph.models.extensions.Drive;
+import com.microsoft.graph.models.extensions.EmailAddress;
 import com.microsoft.graph.models.extensions.IGraphServiceClient;
 import com.microsoft.graph.requests.extensions.GraphServiceClient;
 import com.microsoft.graph.requests.extensions.IContactCollectionPage;
@@ -276,7 +277,7 @@ public class NewOutlookActivity extends AppCompatActivity {
                 });
 
 */
-        graphClient
+   /*     graphClient
                 .me()
                 .contacts()
                 .buildRequest()
@@ -294,7 +295,35 @@ public class NewOutlookActivity extends AppCompatActivity {
                     public void failure(ClientException ex) {
                         displayError(ex);
                     }
+                });*/
+
+        graphClient
+                .me()
+                .contacts("AQMkADAwATMwMAItZmYAODQtZDJkZS0wMAItMDAKAEYAAAPV-1Ykj1Y8RJ8mA_YzybtTBwCv70Qd2gIrRrgU5UMEaUgYAAACAQ4AAACv70Qd2gIrRrgU5UMEaUgYAAKqokuGAAAA")
+                .buildRequest()
+                .get(new ICallback<Contact>() {
+                    @Override
+                    public void success(Contact contact) {
+                        Log.d(TAG, "Contact " + contact.emailAddresses);
+                        ArrayList<EmailAddress> emailAddresses = new ArrayList<>();
+                        emailAddresses.addAll(contact.emailAddresses);
+
+                        StringBuilder sb = new StringBuilder();
+                        for (EmailAddress emailAddress : emailAddresses) {
+                            sb.append(emailAddress.address);
+                            sb.append("\n");
+                        }
+
+                        logTextView.setText(sb.toString());
+                    }
+
+                    @Override
+                    public void failure(ClientException ex) {
+                        Log.d(TAG, "Email Not ound " + ex.getMessage());
+                    }
                 });
+
+
     }
 
 
